@@ -7,11 +7,133 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import { SettingsSystemDaydreamRounded } from "@mui/icons-material";
+
+
+// getting the values off local storage
+const getDatafromLS = () => {
+  const data = localStorage.getItem('historicaldata');
+  if (data) {
+    const localstoragePull = JSON.parse(data)
+    return JSON.parse(data);
+  }
+  else {
+    return []
+  }
+}
+
+// function findPrice(props) {
+//   const found2 = coinList.find(obj => {
+//     return obj.name == props
+//   })
+//   console.log(found2.current_price)
+//   return found2.current_price
+
+// }
+
 
 const CoinData = () => {
+  const currency = "usd"
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [coinList, setCoinList] = useState([]);
+  const [open, setOpen] = React.useState(false);
+  const [tableData, setTableData] = useState([])
+  const [formdata, setFormdata] = useState(
+    {
+      coinname: '',
+      holdings: '',
+      app: ''
+
+    }
+  )
+  const [holdings, setHoldings] = useState(0);
+  const [app, setApp] = useState(0);
+  const [historicaldata, setHistoricaldata] = useState(getDatafromLS());
+  const [rows, setRows] = useState([])
+
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const enteredHoldings = (event) => {
+
+  }
+
+  let namearray = (coinList.map((item) => {
+    const { name } = item;
+    return (
+      name
+    )
+  }))
+
+  let pricearray = (coinList.map((item) => {
+    const { current_price } = item;
+    return (
+      current_price
+    )
+  }))
+
+
+  const handleChange = (evnt) => {
+    const newInput = (data) => ({ ...data, [evnt.target.name]: evnt.target.value })
+    setFormdata(newInput)
+  }
+
+  const handleSubmit = (evnt) => {
+    evnt.preventDefault();
+    const checkEmptyInput = !Object.values(formdata).every(res => res === "")
+    if (checkEmptyInput) {
+      const newData = (data) => ([...data, formdata])
+      setHistoricaldata(newData);
+      const emptyInput = { coinname: '', holdings: '', app: '' }
+      setFormdata(emptyInput)
+      const found = coinList.find(obj => {
+        return obj.name == formdata.coinname
+      })
+      console.log(found)
+      const newData2 = (data) => ([...data, createData(formdata.coinname, formdata.holdings, formdata.app, found.current_price)])
+      setRows(newData2)
+    }
+  }
+
+  // saving data to local storage
+  useEffect(() => {
+    localStorage.setItem('historicaldata', JSON.stringify(historicaldata));
+  }, [historicaldata])
+
+
+  function handleRow() {
+    // for (let i = 0; i < historicaldata.length; i++) {
+    //   console.log("I got inside for loop")
+    //   rows.push(createData(historicaldata[i].name, historicaldata[i].holdings, historicaldata[i].app, pricearray[i]))
+    // }
+  }
+
+  console.log(historicaldata)
+
+
+
+  // for (let i = 0; i < namearray.length; i++) {
+  //   console.log(namearray[i])
+  //   if (formdata.some(e => e.name === namearray[i])) {
+  //     console.log("i got here")
+  //     rows.push(createData(namearray[i], historicaldata[i].holdings, historicaldata[i].app, pricearray[i]))
+  //   }
+  // }
+
   useEffect(() => {
     fetch(
       "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc"
@@ -20,7 +142,7 @@ const CoinData = () => {
       .then((data) => setCoinList(data));
   }, []);
 
-  console.log(coinList);
+  //console.log(coinList);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -78,30 +200,25 @@ const CoinData = () => {
     return { coin, holdings, app, cprice, totali, cvalue, profit };
   }
 
-  coinList.map((coin) => {
-    createData(coin.name, coin.current_price, 99, 99);
-  });
-  const rows = [
-    // coinList.map((coin) => {
-    //   createData(coin.name, coin.current_price, 99, 99);
-    // }),
-    // createData(c, 22, 10000, 12500),
-    createData("BTC", 22, 10000, 12500),
-    createData("ETH", 35, 10000, 11300),
-    createData("MAT", 37, 1, 1.25),
-    createData("United States", "US", 327167434, 9833520),
-    createData("Canada", "CA", 37602103, 9984670),
-    createData("Australia", "AU", 25475400, 7692024),
-    createData("Germany", "DE", 83019200, 357578),
-    createData("Ireland", "IE", 4857000, 70273),
-    createData("Mexico", "MX", 126577691, 1972550),
-    createData("Japan", "JP", 126317000, 377973),
-    createData("France", "FR", 67022000, 640679),
-    createData("United Kingdom", "GB", 67545757, 242495),
-    createData("Russia", "RU", 146793744, 17098246),
-    createData("Nigeria", "NG", 200962417, 923768),
-    createData("Brazil", "BR", 210147125, 8515767),
-  ];
+  // coinList.map((coin) => {
+  //   createData(coin.name, coin.current_price, 99, 99);
+  // });
+
+  // rows = []
+
+  // for (let i = 0; i < namearray.length; i++) {
+  //   console.log(namearray[i])
+  //   if (formdata.some(e => e.name === namearray[i])) {
+  //     console.log("i got here")
+  //     rows.push(createData(namearray[i], historicaldata[i].holdings, historicaldata[i].app, pricearray[i]))
+  //   }
+  // }
+  //   // coinList.map((coin) => {
+  //   //   createData(coin.name, coin.current_price, 99, 99);
+  //   // }),
+  //   // createData(c, 22, 10000, 12500),
+  //   createData("BTC", 22, 10000, 12500),
+
   return (
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
       <TableContainer sx={{ maxHeight: 440 }}>
@@ -150,6 +267,60 @@ const CoinData = () => {
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
+      <div>
+        <Button variant="outlined" onClick={handleClickOpen}>
+          ADD COIN
+        </Button>
+        <Dialog open={open} onClose={handleClose} onSubmit={handleSubmit}>
+          <DialogTitle>ADD COIN</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              To subscribe to this website, please enter your email address here. We
+              will send updates occasionally.
+            </DialogContentText>
+            <TextField
+              autoFocus
+              margin="dense"
+              id="coinname"
+              name="coinname"
+              label="Coin Name"
+              type="text"
+              fullWidth
+              variant="standard"
+              onChange={handleChange}
+              value={formdata.coinname}
+            />
+            <TextField
+              autoFocus
+              margin="dense"
+              id="holdings"
+              name="holdings"
+              label="Coin Holdings"
+              type="number"
+              fullWidth
+              variant="standard"
+              value={formdata.holdings}
+              onChange={handleChange}
+            />
+            <TextField
+              autoFocus
+              margin="dense"
+              id="app"
+              name="app"
+              label="Average Purchase Price"
+              type="number"
+              fullWidth
+              variant="standard"
+              value={formdata.app}
+              onChange={handleChange}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose}>Cancel</Button>
+            <Button type="submit" onClick={handleSubmit}>Add Coin</Button>
+          </DialogActions>
+        </Dialog>
+      </div>
     </Paper>
   );
 };
