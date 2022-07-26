@@ -2,15 +2,18 @@ import React from "react";
 import DrawerAppBar from "./components/DrawerAppBar";
 import Hero from "./components/Hero";
 import StickyHeadTable from "./components/StickyHeadTable";
+import Table2 from "./components/Table2"
 
-import CoinData from "./components/CoinData";
+import DataCall from "./components/DataCall";
 const App = () => {
   return (
     <>
       <DrawerAppBar />
       <Hero />
       {/* <StickyHeadTable /> */}
-      <CoinData />
+      {/* <CoinData /> */}
+      {/* <Table2 /> */}
+      <DataCall />
     </>
   );
 };
