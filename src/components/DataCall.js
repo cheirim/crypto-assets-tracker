@@ -17,9 +17,22 @@ import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import Table2 from "./Table2"
 
+
+const getDatafromLS = () => {
+    const data = localStorage.getItem("items");
+    if (data) {
+        return JSON.parse(data);
+    } else {
+        return [];
+    }
+};
+
+
+
+
 const DataCall = () => {
     const [coinList, setCoinList] = useState([]);
-    const [dataHistory, setDataHistory] = useState([]);
+    const [dataHistory, setDataHistory] = useState(getDatafromLS());
     const [open, setOpen] = useState(false);
     // const [page, setPage] = React.useState(0);
     // const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -34,12 +47,23 @@ const DataCall = () => {
     // USE EFFETS
 
     useEffect(() => {
-        fetch(
-            "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc"
-        )
-            .then((res) => res.json())
-            .then((data) => setCoinList(data));
+        setInterval(() => {
+            const fetchData = async () => {
+                try {
+                    fetch(
+                        "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc"
+                    )
+                        .then((res) => res.json())
+                        .then((data) => setCoinList(data));
+                } catch (error) {
+                    console.log("error", error)
+                }
+            }
+
+            fetchData()
+        }, 10000)
     }, []);
+
 
     useEffect(() => {
         const items = JSON.parse(localStorage.getItem("items"));
@@ -50,6 +74,7 @@ const DataCall = () => {
         localStorage.setItem("items", JSON.stringify(dataHistory));
     }, [dataHistory]);
 
+    console.log(coinList)
     // FUNCTIONS
 
     const handleSubmit = (e) => {
@@ -73,82 +98,86 @@ const DataCall = () => {
         setOpen(false);
     };
 
-    return (
-        <div>
-            <Table2 data={coinList} history={dataHistory} />
-            <Button variant="outlined" onClick={handleClickOpen}>
-                Add Coin
-            </Button>
-            <Dialog open={open} onClose={handleClose}>
-                <DialogTitle>Add Coin</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        Complete the fields to add a new coin to your portfolio
-                    </DialogContentText>
-                    <Autocomplete
-                        id="combo-box-demo"
-                        options={coinList}
-                        getOptionLabel={(option) => option.name}
-                        sx={{ width: 300 }}
-                        onChange={(e, value) =>
-                            setFormdata({ ...formdata, coinname: value.name })
-                        }
-                        name="Coins"
-                        label="Coins"
-                        type="text"
-                        renderInput={(params) => <TextField {...params} label="Coins" />}
-                    />
-                    <TextField
-                        margin="dense"
-                        id="holdings"
-                        name="holdings"
-                        label="Coin Holdings"
-                        type="number"
-                        fullWidth
-                        autoComplete="off"
-                        variant="standard"
-                        value={formdata.holdings}
-                        onChange={(e) =>
-                            setFormdata({ ...formdata, holdings: e.target.value })
-                        }
-                    />
-                    <TextField
-                        margin="dense"
-                        id="app"
-                        name="app"
-                        label="Average Purchase Price"
-                        type="number"
-                        fullWidth
-                        variant="standard"
-                        autoComplete="off"
-                        value={formdata.app}
-                        onChange={(e) => setFormdata({ ...formdata, app: e.target.value })}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose}>Cancel</Button>
-                    <Button onClick={handleSubmit}>Subscribe</Button>
-                </DialogActions>
-            </Dialog>
-
+    if (coinList.length > 1) {
+        return (
             <div>
-                {dataHistory &&
-                    coinList &&
-                    coinList.map((item) => {
-                        return dataHistory.map((coin) => {
-                            if (item.name === coin.coinname) {
-                                return (
-                                    <p>
-                                        {coin.coinname} {item.current_price} {coin.holdings}
-                                        {coin.app} {item.id}
-                                    </p>
-                                );
+                <Table2 data={coinList} history={dataHistory} />
+                <Button variant="outlined" onClick={handleClickOpen}>
+                    Add Coin
+                </Button>
+                <Dialog open={open} onClose={handleClose}>
+                    <DialogTitle>Add Coin</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                            Complete the fields to add a new coin to your portfolio
+                        </DialogContentText>
+                        <Autocomplete
+                            id="combo-box-demo"
+                            options={coinList}
+                            getOptionLabel={(option) => option.name}
+                            sx={{ width: 300 }}
+                            onChange={(e, value) =>
+                                setFormdata({ ...formdata, coinname: value.name })
                             }
-                        });
-                    })}
-            </div>
+                            name="Coins"
+                            label="Coins"
+                            type="text"
+                            renderInput={(params) => <TextField {...params} label="Coins" />}
+                        />
+                        <TextField
+                            margin="dense"
+                            id="holdings"
+                            name="holdings"
+                            label="Coin Holdings"
+                            type="number"
+                            fullWidth
+                            autoComplete="off"
+                            variant="standard"
+                            value={formdata.holdings}
+                            onChange={(e) =>
+                                setFormdata({ ...formdata, holdings: e.target.value })
+                            }
+                        />
+                        <TextField
+                            margin="dense"
+                            id="app"
+                            name="app"
+                            label="Average Purchase Price"
+                            type="number"
+                            fullWidth
+                            variant="standard"
+                            autoComplete="off"
+                            value={formdata.app}
+                            onChange={(e) => setFormdata({ ...formdata, app: e.target.value })}
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleClose}>Cancel</Button>
+                        <Button onClick={handleSubmit}>Add Coin</Button>
+                    </DialogActions>
+                </Dialog>
 
-        </div>
-    );
+                {/* <div>
+                    {dataHistory &&
+                        coinList &&
+                        coinList.map((item) => {
+                            return dataHistory.map((coin) => {
+                                if (item.name === coin.coinname) {
+                                    return (
+                                        <p>
+                                            {coin.coinname} {item.current_price} {coin.holdings}
+                                            {coin.app} {item.id}
+                                        </p>
+                                    );
+                                }
+                            });
+                        })}
+                </div> */}
+
+            </div>
+        );
+
+    }
+
 };
 export default DataCall;
