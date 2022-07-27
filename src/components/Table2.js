@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
-import 'antd/dist/antd.css';
+import 'antd/dist/antd.min.css';
 import { Table } from 'antd';
+import Hero from "./Hero";
 
 let data = []
-
+let portfolio = 0
+let total_profit = 0
+let total_24hchange = 0
 
 // const getDatafromLS = () => {
 //     const data = localStorage.getItem("historicaldata");
@@ -63,7 +66,7 @@ const columns = [
         },
     },
     {
-        title: 'Average Purchase Price',
+        title: 'Avg Purchase Price',
         dataIndex: 'app',
         sorter: {
             compare: (a, b) => a.math - b.math,
@@ -81,6 +84,14 @@ const columns = [
     {
         title: 'Total Investment',
         dataIndex: 'total_investment',
+        sorter: {
+            compare: (a, b) => a.english - b.english,
+            multiple: 1,
+        },
+    },
+    {
+        title: 'Current Value',
+        dataIndex: 'current_value',
         sorter: {
             compare: (a, b) => a.english - b.english,
             multiple: 1,
@@ -116,49 +127,62 @@ const columns = [
 //     },
 // ];
 
-const onChange = (pagination, filters, sorter, extra) => {
-    console.log('params', pagination, filters, sorter, extra);
-};
+
 
 const Table2 = (props) => {
 
+    const onChange = (pagination, filters, sorter, extra) => {
+        console.log('params', pagination, filters, sorter, extra);
+    };
+
     if (props.history.length > 0) {
         data = []
+        portfolio = 0
+        total_profit = 0
+        total_24hchange = 0
         for (let i = 0; i < props.history.length; i++) {
             let cname = null
             let holdings = 0
             let app = 0
             let id = ""
-            let pp = (props.data[i]).map((item) => {
-                return (props.history[i]).map((coin) => {
-                    if (item.name === coin.coinname) {
-                        return item.current_price
-                    }
-                });
-            })
-            console.log(pp)
             cname = props.history[i].coinname
             holdings = props.history[i].holdings
             app = props.history[i].app
             id = props.history[i].id
             let totali = holdings * app
+            const results = props.data.filter(obj => {
+                return obj.name === cname
+            });
+            console.log(props.history)
+            console.log(props.data)
+            console.log(results[0].current_price)
+            let pricechange_24h = results[0].price_change_24h * holdings
+            total_24hchange = total_24hchange + pricechange_24h
+            let cprofit = (holdings * results[0].current_price) - totali
+            let cvalue = holdings * results[0].current_price
+            portfolio = portfolio + cvalue
+            total_profit = total_profit + cprofit
             data.push({
                 cryptoname: cname,
                 holdings: holdings,
                 app: app,
-                current_price: 0,
-                total_investment: totali,
-                profit: 0,
+                current_price: results[0].current_price,
+                total_investment: totali.toFixed(2),
+                current_value: cvalue.toFixed(2),
+                profit: cprofit.toFixed(2),
             })
         }
         //     useEffect(() => {
         //         console.log("using use effects")
         //         refreshTable()
         //     }, [localStorage.getItem("historicaldata")])
-        console.log(data)
+        //console.log(data)
     }
     return (
-        <Table columns={columns} dataSource={data} onChange={onChange} />
+        <div>
+            <Hero data={portfolio} tprofit={total_profit} t24hchange={total_24hchange} />
+            <Table columns={columns} dataSource={data} onChange={onChange} />
+        </div>
     )
 }
 
