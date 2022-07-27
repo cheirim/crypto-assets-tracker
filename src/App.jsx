@@ -9,7 +9,7 @@ const App = () => {
   return (
     <>
       <DrawerAppBar />
-      <Hero />
+      {/* <Hero /> */}
       {/* <StickyHeadTable /> */}
       {/* <CoinData /> */}
       {/* <Table2 /> */}
