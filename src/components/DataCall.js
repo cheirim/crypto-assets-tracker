@@ -78,18 +78,33 @@ const DataCall = () => {
     // FUNCTIONS
 
     const handleSubmit = (e) => {
-        e.preventDefault();
-        if (formdata.coinname && coinList) {
-            coinList.map((item) => {
-                if (item.name === formdata.coinname) {
-                    setDataHistory([...dataHistory, formdata]);
-                    setOpen(false);
-                    setFormdata({ coinname: "", holdings: "", app: "", id: "" });
-                }
-                return "not found";
-            });
-        }
-    };
+    e.preventDefault();
+    if (coinList && dataHistory.length === 0) {
+      coinList.map((item) => {
+        console.log(formdata.coinname);
+       
+          setDataHistory([...dataHistory, formdata]);
+          setOpen(false);
+          setFormdata({ coinname: "", holdings: "", app: "", id: "" });
+        
+      });
+    } else if (dataHistory.length > 0) {
+      let answer = true;
+      answer = dataHistory.every((el) => el.coinname !== formdata.coinname);
+      // console.log(answer);
+      if (answer) {
+        setDataHistory([...dataHistory, formdata]);
+        setOpen(false);
+        setFormdata({ coinname: "", holdings: "", app: "", id: "" });
+      } else {
+        console.log("already exists");
+        setFormdata({ coinname: "", holdings: "", app: "", id: "" });
+      }
+    } else {
+      console.log("error");
+      setFormdata({ coinname: "", holdings: "", app: "", id: "" });
+    }
+  };
     const handleClickOpen = () => {
         setOpen(true);
     };
