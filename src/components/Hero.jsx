@@ -1,7 +1,7 @@
 import React from "react";
 import { Container, Typography, Box, Divider } from "@mui/material/";
 
-const Hero = () => {
+const Hero = (props) => {
   return (
     <Container>
       <Box
@@ -23,7 +23,7 @@ const Hero = () => {
             Portfolio Value:{" "}
           </Typography>
           <Typography variant="h4" sx={{ ml: "auto", mr: "auto" }}>
-            159$
+            $ {(props.data).toFixed(2)}
           </Typography>
         </Box>
         <Box
@@ -44,7 +44,7 @@ const Hero = () => {
               24H Change
             </Typography>
             <Typography variant="h6" sx={{ ml: "auto", mr: "auto" }}>
-              29$
+              $ {(props.t24hchange).toFixed(2)}
             </Typography>
           </Box>
 
@@ -59,7 +59,7 @@ const Hero = () => {
               Profit / Loss:
             </Typography>
             <Typography variant="h6" sx={{ ml: "auto", mr: "auto" }}>
-              19$
+              $ {(props.tprofit).toFixed(2)}
             </Typography>
           </Box>
         </Box>
@@ -81,7 +81,7 @@ const Hero = () => {
         >
           <Typography variant="h6">Portfolio Value: </Typography>
           <Typography variant="h6" sx={{ ml: "auto", mr: "auto" }}>
-            199$
+            $ {(props.data).toFixed(2)}
           </Typography>
         </Box>
         <Box
@@ -93,7 +93,7 @@ const Hero = () => {
         >
           <Typography variant="h6">24H Change</Typography>
           <Typography variant="h6" sx={{ ml: "auto", mr: "auto" }}>
-            -15$
+            $ {(props.t24hchange).toFixed(2)}
           </Typography>
         </Box>
         <Box
@@ -105,7 +105,7 @@ const Hero = () => {
         >
           <Typography variant="h6">Profit / Loss </Typography>
           <Typography variant="h6" sx={{ ml: "auto", mr: "auto" }}>
-            -25$
+            $ {(props.tprofit).toFixed(2)}
           </Typography>
         </Box>
       </Box>
