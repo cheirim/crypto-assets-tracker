@@ -77,34 +77,59 @@ const DataCall = () => {
     console.log(coinList)
     // FUNCTIONS
 
-    const handleSubmit = (e) => {
+     const handleSubmit = (e) => {
     e.preventDefault();
     if (coinList && dataHistory.length === 0) {
-      coinList.map((item) => {
-        console.log(formdata.coinname);
-       
-          setDataHistory([...dataHistory, formdata]);
-          setOpen(false);
-          setFormdata({ coinname: "", holdings: "", app: "", id: "" });
-        
+      coinList.map((coin) => {
+        if (formdata.coinname === coin.name) {
+          setDataHistory([
+            ...dataHistory,
+            {
+              coinname: coin.name,
+              holdings: formdata.holdings,
+              app: formdata.app,
+              current_price: coin.current_price,
+              id: coin.id,
+            },
+          ]);
+        }
       });
+
+      setOpen(false);
+      setFormdata({ coinname: "", holdings: "", app: "", id: "" });
     } else if (dataHistory.length > 0) {
       let answer = true;
       answer = dataHistory.every((el) => el.coinname !== formdata.coinname);
-      // console.log(answer);
+      console.log(answer);
       if (answer) {
-        setDataHistory([...dataHistory, formdata]);
+        coinList.filter((coin) => {
+          if (coin.name === formdata.coinname) {
+            return setDataHistory([
+              ...dataHistory,
+              {
+                coinname: coin.name,
+                holdings: formdata.holdings,
+                app: formdata.app,
+                current_price: coin.current_price,
+                id: coin.id,
+              },
+            ]);
+          }
+        });
         setOpen(false);
+        console.log(dataHistory);
         setFormdata({ coinname: "", holdings: "", app: "", id: "" });
       } else {
         console.log("already exists");
+
         setFormdata({ coinname: "", holdings: "", app: "", id: "" });
       }
     } else {
       console.log("error");
-      setFormdata({ coinname: "", holdings: "", app: "", id: "" });
+      setFormdata({ holdings: "", app: "", id: "" });
     }
   };
+  console.log(dataHistory);
     const handleClickOpen = () => {
         setOpen(true);
     };
